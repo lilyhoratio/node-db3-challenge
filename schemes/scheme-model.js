@@ -3,10 +3,10 @@ const db = require("../data/dbConfig.js");
 module.exports = {
   find,
   findById,
-  findSteps
-  //   add,
-  //   update,
-  //   remove
+  findSteps,
+  add,
+  update,
+  remove
 };
 
 // - `find()`:
@@ -49,14 +49,34 @@ function findSteps(id) {
 //   - Expects a scheme object.
 //   - Inserts scheme into the database.
 //   - Resolves to the newly inserted scheme, including `id`.
+function add(scheme) {
+  return db("schemes")
+    .insert(scheme)
+    .then(([id]) => {
+      return findById(id).select("id", "scheme_name");
+    });
+}
 
 // - `update(changes, id)`:
 //   - Expects a changes object and an `id`.
 //   - Updates the scheme with the given id.
 //   - Resolves to the newly updated scheme object.
+function update(changes, id) {
+  return db("schemes")
+    .where({ id })
+    .update(changes)
+    .then(() => {
+      return findById(id);
+    });
+}
 
 // - `remove(id)`:
 //   - Removes the scheme object with the provided id.
 //   - Resolves to the removed scheme
 //   - Resolves to `null` on an invalid id.
 //   - (Hint: Only worry about removing the `scheme`. The database is configured to automatically remove all associated steps.)
+function remove(id) {
+  return db("schemes")
+    .where("id", id)
+    .delete();
+}
